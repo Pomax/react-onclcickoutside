@@ -1,4 +1,21 @@
 /**
+ * Check if classList contains any of the given classes,
+ * transparently handling singular and array cases.
+ */
+function containsAny(classList, classes) {
+  if (Array.isArray(classes)) {
+    for (const className of classes) {
+      if (classList.contains(className)) {
+        return true;
+      }
+    }
+    return false;
+  } else {
+    return classList.contains(classes);
+  }
+}
+
+/**
  * Check whether some DOM node is our Component's node.
  */
 function isNodeFound(current, componentNode, ignoreClass) {
@@ -12,9 +29,9 @@ function isNodeFound(current, componentNode, ignoreClass) {
   // See: http://www.w3.org/TR/SVG11/struct.html#InterfaceSVGUseElement
   // Discussion: https://github.com/Pomax/react-onclickoutside/pull/17
   if (current.correspondingElement) {
-    return current.correspondingElement.classList.contains(ignoreClass);
+    return containsAny(current.correspondingElement.classList, ignoreClass);
   }
-  return current.classList.contains(ignoreClass);
+  return containsAny(current.classList, ignoreClass);
 }
 
 /**

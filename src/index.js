@@ -25,7 +25,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
     static defaultProps = {
       eventTypes: ['mousedown', 'touchstart'],
       excludeScrollbar: (config && config.excludeScrollbar) || false,
-      outsideClickIgnoreClass: IGNORE_CLASS_NAME,
+      outsideClickIgnoreClass: (config && config.outsideClickIgnoreClass) || IGNORE_CLASS_NAME,
       preventDefault: false,
       stopPropagation: false,
     };
