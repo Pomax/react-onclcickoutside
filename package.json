@@ -40,7 +40,7 @@
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c rollup.umd.config.js -i src/index.js -o dist/react-onclickoutside.min.js",
     "lint": "eslint src/*.js ./test",
     "test": "run-s test:**",
-    "test:basic": "run-s lint build:cjs",
+    "test:basic": "run-s lint build:es",
     "test:karma": "karma start test/karma.conf.js --single-run",
     "test:nodom": "mocha test/no-dom-test.js",
     "precommit": "npm test && lint-staged",

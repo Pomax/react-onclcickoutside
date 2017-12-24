@@ -1,29 +1,25 @@
 /**
  * Check whether some DOM node is our Component's node.
  */
-export function isNodeFound(current, componentNode, ignoreClass) {
-  if (current === componentNode) {
-    return true;
-  }
+function hasClass(node, ignoreClass) {
   // SVG <use/> elements do not technically reside in the rendered DOM, so
   // they do not have classList directly, but they offer a link to their
   // corresponding element, which can have classList. This extra check is for
   // that case.
   // See: http://www.w3.org/TR/SVG11/struct.html#InterfaceSVGUseElement
   // Discussion: https://github.com/Pomax/react-onclickoutside/pull/17
-  if (current.correspondingElement) {
-    return current.correspondingElement.classList.contains(ignoreClass);
-  }
-  return current.classList.contains(ignoreClass);
+  return (node.correspondingElement || node).classList.contains(ignoreClass);
 }
 
 /**
  * Try to find our node in a hierarchy of nodes, returning the document
  * node as highest node if our node is not found in the path up.
  */
-export function findHighest(current, componentNode, ignoreClass) {
+export function clickedOutsideNodeAndIgnoredSubtree(componentNode, event, ignoreClass) {
+  let current = event.target;
+
   if (current === componentNode) {
-    return true;
+    return false;
   }
 
   // If source=local then this event came from 'somewhere'
@@ -32,17 +28,17 @@ export function findHighest(current, componentNode, ignoreClass) {
   // thinking in terms of Dom node nesting, running counter
   // to React's 'you shouldn't care about the DOM' philosophy.
   while (current.parentNode) {
-    if (isNodeFound(current, componentNode, ignoreClass)) {
-      return true;
+    if (current === componentNode || hasClass(current, ignoreClass)) {
+      return false;
     }
     current = current.parentNode;
   }
-  return current;
+  return true;
 }
 
 /**
  * Check if the browser scrollbar was clicked
  */
-export function clickedScrollbar(evt) {
+export function clickedBrowserScrollbar(evt) {
   return document.documentElement.clientWidth <= evt.clientX || document.documentElement.clientHeight <= evt.clientY;
 }

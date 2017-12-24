@@ -37,7 +37,13 @@ describe('onclickoutside hoc', function() {
     }
   }
 
-  var WrappedComponent = wrapComponent(Component);
+  var WrappedComponent = wrapComponent(Component, {
+    handleClickOutside(instance) {
+      return function(event) {
+        instance.handleClickOutside(event);
+      };
+    }
+  });
 
   // tests
 
