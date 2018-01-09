@@ -40,9 +40,36 @@ export function findHighest(current, componentNode, ignoreClass) {
   return current;
 }
 
+const calcScrollbarWidth = container => {
+  return container.offsetWidth - container.clientWidth;
+};
+
+const clickedOnContainerScrollbar = evt => {
+  // Get the clicked container.
+  const container = evt.target;
+
+  const containerBounds = container.getBoundingClientRect();
+  const clientX = evt.clientX;
+  const clientY = evt.clientY;
+  const scrollbarWidth = calcScrollbarWidth(container);
+
+  // If the scrollbar width is zero, there is no scrollbar => return false
+  return scrollbarWidth
+    ? // Check if the click is in the X bounds of the scrollbar and y bounds of the container.
+      clientX < containerBounds.right &&
+        clientX > containerBounds.right - scrollbarWidth &&
+        (clientY > containerBounds.top && clientY < containerBounds.bottom)
+    : false;
+};
+
 /**
- * Check if the browser scrollbar was clicked
+ * Check if a scrollbar was clicked.
  */
 export function clickedScrollbar(evt) {
-  return document.documentElement.clientWidth <= evt.clientX || document.documentElement.clientHeight <= evt.clientY;
+  // Check if it was the browser scrollbar or a container scrollbar.
+  return (
+    document.documentElement.clientWidth <= evt.clientX ||
+    document.documentElement.clientHeight <= evt.clientY ||
+    clickedOnContainerScrollbar(evt)
+  );
 }

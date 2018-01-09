@@ -81,12 +81,31 @@ function findHighest(current, componentNode, ignoreClass) {
 
   return current;
 }
+
+var calcScrollbarWidth = function calcScrollbarWidth(container) {
+  return container.offsetWidth - container.clientWidth;
+};
+
+var clickedOnContainerScrollbar = function clickedOnContainerScrollbar(evt) {
+  // Get the clicked container.
+  var container = evt.target;
+  var containerBounds = container.getBoundingClientRect();
+  var clientX = evt.clientX;
+  var clientY = evt.clientY;
+  var scrollbarWidth = calcScrollbarWidth(container); // If the scrollbar width is zero, there is no scrollbar => return false
+
+  return scrollbarWidth ? // Check if the click is in the X bounds of the scrollbar and y bounds of the container.
+  clientX < containerBounds.right && clientX > containerBounds.right - scrollbarWidth && clientY > containerBounds.top && clientY < containerBounds.bottom : false;
+};
 /**
- * Check if the browser scrollbar was clicked
+ * Check if a scrollbar was clicked.
  */
 
+
 function clickedScrollbar(evt) {
-  return document.documentElement.clientWidth <= evt.clientX || document.documentElement.clientHeight <= evt.clientY;
+  // Check if it was the browser scrollbar.
+  return document.documentElement.clientWidth <= evt.clientX || document.documentElement.clientHeight <= evt.clientY // Or a container scrollbar.
+  || clickedOnContainerScrollbar(evt);
 }
 
 // ideally will get replaced with external dep
