@@ -132,13 +132,15 @@ var IGNORE_CLASS_NAME = 'ignore-react-onclickoutside';
  */
 
 function getEventHandlerOptions(instance, eventName) {
-  var handlerOptions = null;
+  var handlerOptions = {};
   var isTouchEvent = touchEvents.indexOf(eventName) !== -1;
 
   if (isTouchEvent && passiveEventSupport) {
-    handlerOptions = {
-      passive: !instance.props.preventDefault
-    };
+    handlerOptions.passive = !instance.props.preventDefault;
+  }
+
+  if (eventName === 'scroll') {
+    handlerOptions.capture = true;
   }
 
   return handlerOptions;
