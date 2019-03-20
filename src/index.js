@@ -116,7 +116,9 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
     }
 
     componentDidUpdate() {
-      this.componentNode = findDOMNode(this.getInstance());
+      if (this.isMounted) {
+        this.componentNode = findDOMNode(this.getInstance());
+      }
     }
 
     /**
