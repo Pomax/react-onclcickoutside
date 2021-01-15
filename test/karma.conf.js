@@ -20,6 +20,7 @@ module.exports = function(config) {
           },
         ],
       },
+      mode: 'development',
     },
 
     webpackMiddleware: {

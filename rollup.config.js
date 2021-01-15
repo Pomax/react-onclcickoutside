@@ -1,5 +1,5 @@
 import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 const mergeAll = objs => Object.assign({}, ...objs);
@@ -24,8 +24,8 @@ const devUmdConfig = mergeAll([
       format: 'umd',
       name: 'onClickOutside',
       exports: 'named',
+      globals: { react: 'React', 'react-dom': 'ReactDOM' },
     },
-    globals: { react: 'React', 'react-dom': 'ReactDOM' },
     external: Object.keys(pkg.peerDependencies || {}),
   },
 ]);
@@ -35,12 +35,11 @@ const prodUmdConfig = mergeAll([
   { output: mergeAll([devUmdConfig.output, { file: pkg.unpkg }]) },
   {
     plugins: devUmdConfig.plugins.concat(
-      uglify({
+      terser({
         compress: {
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false,
         },
       })
     ),

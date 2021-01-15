@@ -2,32 +2,18 @@
 var assert = require('assert');
 var React = require('react');
 var renderer = require('react-test-renderer');
-var requireHijack = require('require-hijack');
+var useOnClickOutside = require('../').useOnClickOutside;
 
-describe('onclickoutside hoc with no DOM', function() {
-  class Component extends React.Component {
-    handleClickOutside() {}
+const TestComponent = props => {
+  const { domRef, ...onClickOutsideProps } = useOnClickOutside(props);
+  return React.createElement('div', { ...onClickOutsideProps, ref: domRef });
+};
 
-    render() {
-      return React.createElement('div');
-    }
-  }
-
-  // tests
-
+describe('onclickoutside hook with no DOM', function() {
   it('should not throw an error if rendered in an environment with no DOM', function() {
-    // Needed until React 15.4 lands due to https://github.com/facebook/react/issues/7386.
-    requireHijack.replace('react-dom').with({
-      render: function() {},
-    });
-
-    // Must import this after we mock out ReactDOM to prevent the inject error.
-    var wrapComponent = require('../').default;
-    var WrappedComponent = wrapComponent(Component);
-
-    var element = React.createElement(WrappedComponent);
+    const element = React.createElement(TestComponent);
     assert(element, 'element can be created');
-    var renderInstance = renderer.create(element);
+    const renderInstance = renderer.create(element);
     assert(renderInstance.toJSON().type === 'div', 'wrapped component renders a div');
   });
 });
