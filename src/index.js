@@ -129,8 +129,19 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
       this.enableOnClickOutside();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
+      const prevDisableOnClickOutside = prevProps.disableOnClickOutside;
+      const disableOnClickOutside = this.props.disableOnClickOutside;
+
       this.componentNode = this.__getComponentNode();
+      // Enable onClickOutside on prop change to `true`
+      if (prevDisableOnClickOutside && !disableOnClickOutside) {
+        this.enableOnClickOutside();
+      }
+      // Disable onClickOutside on prop change to `false`
+      if (!prevDisableOnClickOutside && disableOnClickOutside) {
+        this.disableOnClickOutside();
+      }
     }
 
     /**

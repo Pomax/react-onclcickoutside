@@ -379,6 +379,7 @@ describe('onclickoutside hoc', function() {
         super(...args);
         this.state = {
           clickOutsideHandled: false,
+          timesHandlerCalled: 0,
         };
       }
       handleClickOutside(event) {
@@ -387,6 +388,7 @@ describe('onclickoutside hoc', function() {
         }
         this.setState({
           clickOutsideHandled: true,
+          timesHandlerCalled: this.state.timesHandlerCalled + 1,
         });
       }
 
@@ -395,26 +397,65 @@ describe('onclickoutside hoc', function() {
       }
     }
 
+    var container = document.createElement('div');
+    var WrappedComponent = wrapComponent(Component);
+
+    const rerender = function(props) {
+      return ReactDOM.render(React.createElement(WrappedComponent, props), container);
+    };
+
     it('disableOnclickOutside as true should not call handleClickOutside', function() {
       var component = TestUtils.renderIntoDocument(
-        React.createElement(wrapComponent(Component), { disableOnClickOutside: true }),
+        React.createElement(WrappedComponent, { disableOnClickOutside: true }),
       );
-      document.dispatchEvent(new Event('mousedown'));
       var instance = component.getInstance();
+
+      document.dispatchEvent(new Event('mousedown'));
       assert(instance.state.clickOutsideHandled === false, 'clickOutsideHandled should not get flipped');
     });
 
     it('disableOnclickOutside as true should not call handleClickOutside until enableOnClickOutside is called', function() {
       var component = TestUtils.renderIntoDocument(
-        React.createElement(wrapComponent(Component), { disableOnClickOutside: true }),
+        React.createElement(WrappedComponent, { disableOnClickOutside: true }),
       );
       var instance = component.getInstance();
+
       document.dispatchEvent(new Event('mousedown'));
       assert(instance.state.clickOutsideHandled === false, 'clickOutsideHandled should not get flipped');
 
       instance.props.enableOnClickOutside();
       document.dispatchEvent(new Event('mousedown'));
-      assert(instance.state.clickOutsideHandled === true, 'clickOutsideHandled should not get flipped');
+      assert(instance.state.clickOutsideHandled === true, 'clickOutsideHandled should get flipped');
+    });
+
+    it('disableOnclickOutside as true should not call handleClickOutside until disableOnClickOutside prop changed to false', function() {
+      var component = rerender({ disableOnClickOutside: true });
+      var instance = component.getInstance();
+
+      document.dispatchEvent(new Event('mousedown'));
+      assert(instance.state.clickOutsideHandled === false, 'clickOutsideHandled should not get flipped');
+
+      rerender({ disableOnClickOutside: false });
+
+      document.dispatchEvent(new Event('mousedown'));
+      assert(instance.state.clickOutsideHandled === true, 'clickOutsideHandled should get flipped');
+    });
+
+    it('disableOnclickOutside as false should call handleClickOutside until disableOnClickOutside prop changed to true', function() {
+      var component = rerender({ disableOnClickOutside: false });
+      var instance = component.getInstance();
+      var currentTimesHandlerCalled = instance.state.timesHandlerCalled;
+
+      document.dispatchEvent(new Event('mousedown'));
+      assert(instance.state.clickOutsideHandled === true, 'clickOutsideHandled should get flipped');
+
+      rerender({ disableOnClickOutside: true });
+
+      document.dispatchEvent(new Event('mousedown'));
+      assert(
+        instance.state.timesHandlerCalled === currentTimesHandlerCalled + 1,
+        'clickOutsideHandled should not get flipped once more',
+      );
     });
   });
 

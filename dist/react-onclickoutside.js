@@ -313,8 +313,19 @@ function onClickOutsideHOC(WrappedComponent, config) {
       this.enableOnClickOutside();
     };
 
-    _proto.componentDidUpdate = function componentDidUpdate() {
-      this.componentNode = this.__getComponentNode();
+    _proto.componentDidUpdate = function componentDidUpdate(prevProps) {
+      var prevDisableOnClickOutside = prevProps.disableOnClickOutside;
+      var disableOnClickOutside = this.props.disableOnClickOutside;
+      this.componentNode = this.__getComponentNode(); // Enable onClickOutside on prop change to `true`
+
+      if (prevDisableOnClickOutside && !disableOnClickOutside) {
+        this.enableOnClickOutside();
+      } // Disable onClickOutside on prop change to `false`
+
+
+      if (!prevDisableOnClickOutside && disableOnClickOutside) {
+        this.disableOnClickOutside();
+      }
     };
     /**
      * Remove all document's event listeners for this component
