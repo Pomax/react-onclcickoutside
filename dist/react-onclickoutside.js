@@ -277,7 +277,7 @@ function onClickOutsideHOC(WrappedComponent, config) {
     var _proto = onClickOutside.prototype;
 
     _proto.getInstance = function getInstance() {
-      if (!WrappedComponent.prototype.isReactComponent) {
+      if (!Object.getPrototypeOf(WrappedComponent).isReactComponent) {
         return this;
       }
 
@@ -339,7 +339,7 @@ function onClickOutsideHOC(WrappedComponent, config) {
           excludeScrollbar = _props.excludeScrollbar,
           props = _objectWithoutProperties(_props, ["excludeScrollbar"]);
 
-      if (WrappedComponent.prototype.isReactComponent) {
+      if (Object.getPrototypeOf(WrappedComponent).isReactComponent) {
         props.ref = this.getRef;
       } else {
         props.wrappedRef = this.getRef;

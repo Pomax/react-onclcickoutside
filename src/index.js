@@ -56,7 +56,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
      * Access the WrappedComponent's instance.
      */
     getInstance() {
-      if (!WrappedComponent.prototype.isReactComponent) {
+      if (!Object.getPrototypeOf(WrappedComponent).isReactComponent) {
         return this;
       }
       const ref = this.instanceRef;
@@ -216,7 +216,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
       // eslint-disable-next-line no-unused-vars
       let { excludeScrollbar, ...props } = this.props;
 
-      if (WrappedComponent.prototype.isReactComponent) {
+      if (Object.getPrototypeOf(WrappedComponent).isReactComponent) {
         props.ref = this.getRef;
       } else {
         props.wrappedRef = this.getRef;
