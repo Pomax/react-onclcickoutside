@@ -38,11 +38,11 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
     static displayName = `OnClickOutside(${componentName})`;
 
     static defaultProps = {
-      eventTypes: ['mousedown', 'touchstart'],
+      eventTypes: (config && config.eventTypes) || ['mousedown', 'touchstart'],
       excludeScrollbar: (config && config.excludeScrollbar) || false,
-      outsideClickIgnoreClass: IGNORE_CLASS_NAME,
-      preventDefault: false,
-      stopPropagation: false,
+      outsideClickIgnoreClass: (config && config.outsideClickIgnoreClass) || IGNORE_CLASS_NAME,
+      preventDefault: (config && config.preventDefault) || false,
+      stopPropagation: (config && config.stopPropagation) || false,
     };
 
     static getClass = () => (WrappedComponent.getClass ? WrappedComponent.getClass() : WrappedComponent);
