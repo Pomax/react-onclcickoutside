@@ -33,6 +33,8 @@ transpiled es6 classes rather than `createClass` as of v6.
 * [Installation](#installation)
 * [Usage:](#usage)
   * [ES6 Class Component](#es6-class-component)
+  * [Handler as `handleClickOutside` prop](#handler-as-handleclickoutside-prop)
+  * [Handler as configuration object property](#handler-as-configuration-object-property)
   * [Functional Component with UseState Hook](#functional-component-with-usestate-hook)
   * [CommonJS Require](#commonjs-require)
 * [Ensuring there's a click handler](#ensuring-there-is-a-click-handler)
@@ -75,6 +77,55 @@ class MyComponent extends Component {
 }
 
 export default onClickOutside(MyComponent);
+```
+
+### Handler as configuration object property
+
+You can specify which function should be used by the HOC,
+by indicating which function should be used in the configuration object:
+
+```js
+// load the HOC:
+import React, { Component } from "react";
+import onClickOutside from "react-onclickoutside";
+
+// create a new component, wrapped below by onClickOutside HOC:
+class MyComponent extends Component {
+  // ...
+  myClickOutsideHandler(evt) {
+    // ...handling code goes here...
+  }
+  // ...
+}
+var clickOutsideConfig = {
+  handleClickOutside: function(instance) {
+    return instance.myClickOutsideHandler;
+  }
+};
+var EnhancedComponent = onClickOutside(MyComponent, clickOutsideConfig);
+```
+
+### Handler as `handleClickOutside` prop
+
+You can pass the function to be used by the HOC as a
+component prop `handleClickOutside={...}` in your JSX:
+
+```js
+// load the HOC:
+import React, { Component } from "react";
+import onClickOutside from "react-onclickoutside";
+
+// create a new component, wrapped below by onClickOutside HOC:
+function MyComponent(props) {
+  // ...
+}
+
+var EnhancedComponent = onClickOutside(MyComponent);
+
+// ...handling code should be passed during EnhancedComponent usage:
+<EnhancedComponent handleClickOutside={() => {
+  // ...handling code goes here...
+}} />
 ```
 
 ### Functional Component with UseState Hook
@@ -120,6 +171,7 @@ var MyComponent = onClickOutside(
   })
 );
 ```
+
 
 ### Ensuring there is a click handler
 
