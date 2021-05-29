@@ -24,6 +24,15 @@ function getEventHandlerOptions(instance, eventName) {
   }
   return handlerOptions;
 }
+/**
+ * Detect if we are in browser env
+ */
+const isBrowser = () => typeof document !== 'undefined' && document.createElement;
+
+/**
+ * Default the default document
+ */
+const getDocument = () => document;
 
 /**
  * This function generates the HOC function that you'll use
@@ -50,6 +59,9 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
     constructor(props) {
       super(props);
       this._uid = uid();
+      this.document = isBrowser()
+        ? config && config.getDocument ? config.getDocument(this.getInstance()) : getDocument()
+        : null;
     }
 
     /**
@@ -108,7 +120,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
       // If we are in an environment without a DOM such
       // as shallow rendering or snapshots then we exit
       // early to prevent any unhandled errors being thrown.
-      if (typeof document === 'undefined' || !document.createElement) {
+      if (!isBrowser()) {
         return;
       }
 
@@ -145,7 +157,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
      * for clicks and touches outside of this element.
      */
     enableOnClickOutside = () => {
-      if (typeof document === 'undefined' || enabledInstances[this._uid]) {
+      if (!isBrowser() || enabledInstances[this._uid]) {
         return;
       }
 
@@ -171,11 +183,11 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
           event.stopPropagation();
         }
 
-        if (this.props.excludeScrollbar && DOMHelpers.clickedScrollbar(event)) return;
+        if (this.props.excludeScrollbar && DOMHelpers.clickedScrollbar(event, this.document)) return;
 
         const current = event.target;
 
-        if (DOMHelpers.findHighest(current, this.componentNode, this.props.outsideClickIgnoreClass) !== document) {
+        if (DOMHelpers.findHighest(current, this.componentNode, this.props.outsideClickIgnoreClass) !== this.document) {
           return;
         }
 
@@ -183,7 +195,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
       };
 
       events.forEach(eventName => {
-        document.addEventListener(eventName, handlersMap[this._uid], getEventHandlerOptions(this, eventName));
+        this.document.addEventListener(eventName, handlersMap[this._uid], getEventHandlerOptions(this, eventName));
       });
     };
 
@@ -194,14 +206,13 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
     disableOnClickOutside = () => {
       delete enabledInstances[this._uid];
       const fn = handlersMap[this._uid];
-
-      if (fn && typeof document !== 'undefined') {
+      if (fn && isBrowser()) {
         let events = this.props.eventTypes;
         if (!events.forEach) {
           events = [events];
         }
         events.forEach(eventName =>
-          document.removeEventListener(eventName, fn, getEventHandlerOptions(this, eventName)),
+          this.document.removeEventListener(eventName, fn, getEventHandlerOptions(this, eventName)),
         );
         delete handlersMap[this._uid];
       }

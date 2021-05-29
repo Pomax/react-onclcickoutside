@@ -43,6 +43,6 @@ export function findHighest(current, componentNode, ignoreClass) {
 /**
  * Check if the browser scrollbar was clicked
  */
-export function clickedScrollbar(evt) {
+export function clickedScrollbar(evt, document) {
   return document.documentElement.clientWidth <= evt.clientX || document.documentElement.clientHeight <= evt.clientY;
 }
