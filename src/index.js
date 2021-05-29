@@ -64,6 +64,12 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
     }
 
     __outsideClickHandler = event => {
+      // If we have one popover in another in IE11, after unsubscribing events
+      // IE calls callback for nested popover while this popover was unsubscribed
+      if (typeof this._isSubscribeEvents === 'boolean' && !this._isSubscribeEvents) {
+        return;
+      }
+
       if (typeof this.__clickOutsideHandlerProp === 'function') {
         this.__clickOutsideHandlerProp(event);
         return;
@@ -185,6 +191,8 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
       events.forEach(eventName => {
         document.addEventListener(eventName, handlersMap[this._uid], getEventHandlerOptions(this, eventName));
       });
+
+      this._isSubscribeEvents = true;
     };
 
     /**
@@ -204,6 +212,7 @@ export default function onClickOutsideHOC(WrappedComponent, config) {
           document.removeEventListener(eventName, fn, getEventHandlerOptions(this, eventName)),
         );
         delete handlersMap[this._uid];
+        this._isSubscribeEvents = false;
       }
     };
 
